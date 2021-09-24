@@ -1,14 +1,22 @@
-const {response, request, json} = require('express')
+const {response, request} = require('express')
 const bcrypt = require('bcryptjs')
 const User = require('../models/user')
 
-const usersGet = (req = request,res = response) => {
-    
-    const params = req.query
+const usersGet = async (req = request, res = response) => {
+
+    const {limit = 5, skip = 0} = req.query
+    const query = {status: true}
+
+    const [totalUsers, users] = await Promise.all([
+        User.countDocuments(query),
+        User.find(query)
+        .skip(Number(skip))
+        .limit(Number(limit))
+    ])
 
     res.json({
-        msg:'API get',
-        params
+        totalUsers,
+        users
     })
 }
 
@@ -34,7 +42,7 @@ const usersPost = async (req, res = response) => {
 
 const usersPut = async (req,res = response) => {
     const id = req.params.id
-    const {password, google, email, ...rest} = req.body
+    const {_id, password, google, email, ...rest} = req.body
 
     //Validate to DB
     if (password) {
@@ -44,15 +52,15 @@ const usersPut = async (req,res = response) => {
 
     const user = await User.findByIdAndUpdate(id, rest)
 
-    res.json({
-        msg:'API put',
-        id, 
-        user
-    })
+    res.json(user)
 }
 
-const usersDelete = (req,res = response) => {
-    res.json('Hello World')
+const usersDelete = async (req,res = response) => {
+    const {id} = req.params
+
+    const user = await User.findByIdAndUpdate(id, {status: false})
+
+    res.json(user)
 }
 
 module.exports = {usersGet, usersDelete, usersPost, usersPut}
