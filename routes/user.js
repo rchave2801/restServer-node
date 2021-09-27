@@ -20,7 +20,6 @@ router.post('/', [
     check('email', 'Not valid email').isEmail(),
     check('name', 'Name is required').notEmpty(),
     check('password', 'Password is required and greater than 6 characters').notEmpty().isLength({min: 6}),
-    //check('role', 'Is not a valid role').isIn(['ADMIN_ROLE', 'SUPER_ROLE']),
     check('role').custom(isValidRole),
     check('email').custom(ifEmailExist),
     fieldsValidator
