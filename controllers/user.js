@@ -24,9 +24,6 @@ const usersPost = async (req, res = response) => {
     const {name, email, password, role} = req.body
     const user = new User({name, email, password, role})
 
-    //Verify email
-
-
     //Encrypt pass
     const salt = bcrypt.genSaltSync()
     user.password = bcrypt.hashSync(password, salt)
@@ -57,10 +54,10 @@ const usersPut = async (req,res = response) => {
 
 const usersDelete = async (req,res = response) => {
     const {id} = req.params
+    
+    const deletedUser = await User.findByIdAndUpdate(id, {status: false})
 
-    const user = await User.findByIdAndUpdate(id, {status: false})
-
-    res.json(user)
+    res.json(deletedUser)
 }
 
 module.exports = {usersGet, usersDelete, usersPost, usersPut}
